@@ -1,8 +1,8 @@
 # ConsciousnessBot：學生安裝與設定指南
 
-這份指南讓你把 ConsciousnessBot 安裝在自己的電腦上。它是 **WriteToLearn 的旁路夥伴**：從 WriteToLearn 的 Google Drive 記憶層唯讀資料，整理成 Telegram 上的摘要、提醒與對話；它不會改寫你的 LINE bot、Apps Script 或 Drive 檔案。
+這份指南讓你把 ConsciousnessBot 安裝在自己的電腦上。它是 **WriteToLearn 專用的旁路夥伴**：從 WriteToLearn 的 Google Drive 記憶層唯讀資料，整理成 Telegram 上的摘要、提醒與對話；它不會改寫 WriteToLearn 的 Apps Script 或 Drive 檔案，也**不支援 LearningBot**。
 
-> 先完成 [WriteToLearn 學生安裝](https://github.com/canlgz/WriteToLearn-Student-Setup)。本指南假設你已有可運作的 LINE WriteToLearn，且已能寫入一筆資料。
+> 先完成 [WriteToLearn 學生安裝](https://github.com/canlgz/WriteToLearn-Student-Setup)。本指南假設你已有可運作的 LINE WriteToLearn，且已能寫入一筆資料。先看 [系統定位與運作架構](ARCHITECTURE.md)，了解這項前置條件的原因。
 
 ## 0. 安裝前確認
 

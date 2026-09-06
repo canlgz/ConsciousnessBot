@@ -1,11 +1,17 @@
-# 記寫背景監測 bot（Telegram · 心跳＋主動推播）
+# ConsciousnessBot：WriteToLearn 的意識 bot
 
-一個**獨立、唯讀**的小服務：以你那個 LINE bot 的 Google Drive 資料夾為**記憶層來源**，
-定期（心跳）偵測「記寫背景狀態」，必要時主動 push 到 **Telegram**，讓你隨時掌握
-**整體記寫表現、背景有沒有在動、哪些主題卡在升格邊緣**。
+一個只服務 **WriteToLearn** 的**獨立、唯讀**服務。它以 WriteToLearn 的 Google Drive
+記憶層為唯一外部資料來源，透過心跳持續讀取已形成或正在形成的記寫結構，必要時在
+**Telegram** 主動推播或對話。
 
-- **只監測＋主動推播**，不做對話問答。
-- **不修改** LINE bot 的程式（`src/`），**不寫**那個共享 Drive——只讀。自己的去重/摘要
+它**不是 LearningBot 的功能或升級版**，也不能接到一般 LINE bot 使用。LearningBot、
+WriteToLearn 與 ConsciousnessBot 的定位差異，請見
+[三代工具比較](https://github.com/canlgz/LearningBot-Legacy/blob/main/docs/LEARNING_TOOLS_COMPARISON.md)。
+
+請先閱讀 [系統定位與運作架構](docs/ARCHITECTURE.md)，再依
+[學生安裝與設定指南](docs/STUDENT_SETUP.md) 安裝。
+
+- **只讀 WriteToLearn**：不修改 WriteToLearn 的 Apps Script 或共享 Drive。自己的去重／摘要
   紀錄存在本地 `state.json`。
 - 與 LINE 推播**獨立去重**：這是另一條通知管道，不會被 LINE 已推過的東西消音。
 
