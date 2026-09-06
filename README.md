@@ -11,9 +11,21 @@ WriteToLearn 與 ConsciousnessBot 的定位差異，請見
 請先閱讀 [系統定位與運作架構](docs/ARCHITECTURE.md)，再依
 [學生安裝與設定指南](docs/STUDENT_SETUP.md) 安裝。
 
+## 學生閱讀順序
+
+1. 先完成 [WriteToLearn 學生安裝](https://github.com/canlgz/WriteToLearn-Student-Setup)。
+2. 閱讀 [系統定位與運作架構](docs/ARCHITECTURE.md)，確認它只讀取 WriteToLearn 的資料。
+3. 依 [學生安裝與設定指南](docs/STUDENT_SETUP.md) 建立 Google service account 與 Telegram bot。
+4. 先以 `./run.sh --once --dry-run` 驗證，再啟動常駐服務。
+
+下方「功能與技術運作參考」供想深入了解機制的人閱讀；第一次安裝不需要先修改其中任何參數。
+
 - **只讀 WriteToLearn**：不修改 WriteToLearn 的 Apps Script 或共享 Drive。自己的去重／摘要
   紀錄存在本地 `state.json`。
 - 與 LINE 推播**獨立去重**：這是另一條通知管道，不會被 LINE 已推過的東西消音。
+
+<details>
+<summary>功能與技術運作參考（可在完成安裝後再閱讀）</summary>
 
 ## 推播什麼
 
@@ -34,15 +46,14 @@ WriteToLearn 與 ConsciousnessBot 的定位差異，請見
 **時機**：歸戶通知＝每次心跳（有新歸戶就推）；其餘事件驅動（有值得注意的變化即時推、受
 冷卻節流）＋每日定時摘要。
 
-### 🧠 蘇格拉底式教練（選配，設 `GEMINI_API_KEY` 即啟用）
-沿用 LINE bot 同一把 `GEMINI_API_KEY`，讓 bot 從「報數字」變成「像在旁邊看著你記寫、會追問的存在」：
+### 蘇格拉底式教練（選配，設 `GEMINI_API_KEY` 即啟用）
+沿用 WriteToLearn 的 `GEMINI_API_KEY` 後，可將結構化摘要轉為以提問為主的回應：
 
-- **主動推播有靈魂**：每則歸戶/摘要/升格通知，由教練用一兩句**蘇格拉底式提問**包裝——
+- **主動推播**：每則歸戶、摘要或升格通知可附上一兩句**蘇格拉底式提問**，
   連結你不同主題的記寫、往「轉折」推（概念重述／跨主題整合／行動指向／後設反思）。失敗自動退回樣板。
 - **雙向對話**：你在 Telegram 直接傳訊息，它**紮根你的記憶層**（脈絡/歷程/近期原文）回你。
   只回應你（`TELEGRAM_CHAT_ID`），對話有連續記憶。
-- **像真人一串一串打字**：**對話**回覆會拆成多則短訊（1–2 句一串、最多 3 串），串與串之間補
-  「輸入中…」＋短停頓——讀起來像人在聊天，而非一大塊。**證據性資料**（事實/清單、`/status`、每日摘要、
+- **分段呈現**：**對話**回覆可拆成多則短訊（1–2 句一串、最多 3 串），並以短暫「輸入中」提示區隔。**證據性資料**（事實／清單、`/status`、每日摘要、
   歸戶/事件通知、序參數…）則**維持整塊一則**、不分串，方便閱讀與引用。
 - **呈現附件原檔**：你說「給我看庭院那張照片」「把那份 pdf 調出來」之類，教練會挑出對應的
   記寫，把當初上傳的**原始圖片／PDF／語音／影片**從 Drive 取回、直接傳到 Telegram 給你看/聽
@@ -155,6 +166,8 @@ WriteToLearn 與 ConsciousnessBot 的定位差異，請見
 
 ---
 
+</details>
+
 ## 一次性設定
 
 這個 bot 是 WriteToLearn 的**旁路服務**：它只讀取 WriteToLearn 寫入 Google Drive 的資料，再在 Telegram 上互動；不會修改 LINE bot 或 Drive 內容。請先完成 [WriteToLearn 學生安裝](https://github.com/canlgz/WriteToLearn-Student-Setup)。
@@ -177,20 +190,22 @@ cp .env.example .env
 
 ## 常用指令
 
-`run.sh` 會先更新＋備妥環境再啟動；參數直接透傳：
+`run.sh` 會準備虛擬環境與套件後啟動；參數會直接傳給程式：
 
 | 指令 | 用途 |
 |------|------|
-| `./run.sh` | 更新並常駐（心跳＋對話） |
+| `./run.sh` | 常駐執行（心跳與對話） |
 | `./run.sh --once` | 跑一輪就退出 |
 | `./run.sh --once --dry-run` | 一輪、訊息只印不送（驗證用） |
-| `./run.sh --digest-now` | 立刻強推一則每日摘要 |
+| `./run.sh --digest-now` | 立即傳送一則每日摘要 |
 | `./run.sh --getchatid` | 印出 chat_id |
 
 > 不想用 `run.sh` 也行，等價於 `./.venv/bin/python -m telegram_monitor <參數>`。
 
-> ⚠️ **死了會停、需重啟**：常駐＝「生命迴圈」，任一環斷裂（程式中斷或環境前提不符）＝**終局死亡**——
-> bot 自白「🫀 …我好像死了」後**停止**，不會自己回來。要它再活就重跑 `./run.sh`。
+> ⚠️ **服務中斷後需手動重啟**：常駐迴圈若因程式錯誤或必要環境失效而停止，不會自行恢復。修正原因後，重新執行 `./run.sh`。
+
+<details>
+<summary>完整設定與研發參考（一般學生無須調整）</summary>
 
 ## 設定一覽（`.env`）
 | 變數 | 預設 | 說明 |
@@ -337,17 +352,21 @@ cp .env.example .env
 | `STATE_PATH` | ./state.json | 本地 state 檔 |
 | `DRY_RUN` | 0 | 1＝只印不送 |
 
-## 測試
+</details>
+
+## 維護者測試
 ```bash
 python -m unittest discover -s tests
 ```
 
 ## 注意事項
-- **閾值是鏡射**：`thresholds.py` 複製自 `src/Config.gs` 的 `CONTEXT_CRITERIA`。改動 GAS
-  那邊的判準時，記得同步這裡，否則「還缺什麼」會對不上 LINE 上看到的。
+- **閾值是鏡射**：`thresholds.py` 對應 WriteToLearn 的 `Config.gs` 中 `CONTEXT_CRITERIA`。改動
+  WriteToLearn 的判準時，必須同步檢查本服務，否則兩邊對「還缺什麼」的說明可能不一致。
 - 密度（`semanticDensity`）一律取 LINE 已算好的值，本服務**不重算向量**（也不需要 Gemini key）。
 
-## 觀點修正第一階段
+## 研發驗證紀錄（維護者）
+
+> 以下內容保留研發驗證脈絡；學生安裝與日常使用不需要操作分支、功能旗標或驗證指令。
 
 `codex/conscious-dialogue-core` 新增 `CONSCIOUS_DIALOGUE=1`，預設關閉。
 沿用記寫聯想作為第一個完整接入點，保存原文版本、已送出的假設及明確否定，
