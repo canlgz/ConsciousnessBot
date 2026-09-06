@@ -1,0 +1,11 @@
+# 本地設定與秘密（絕不進版控）
+.env
+*.json.key
+service-account*.json
+# 本地 state（去重/摘要紀錄）
+state.json
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
