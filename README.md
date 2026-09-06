@@ -5,8 +5,8 @@
 **Telegram** 主動推播或對話。
 
 它**不是 LearningBot 的功能或升級版**，也不能接到一般 LINE bot 使用。LearningBot、
-WriteToLearn 與 ConsciousnessBot 的定位差異，請見
-[三代工具比較](https://github.com/canlgz/LearningBot-Legacy/blob/main/docs/LEARNING_TOOLS_COMPARISON.md)。
+WriteToLearn 與 ConsciousnessBot 的定位，以及 LearningBot 作為記寫歷程記錄原始構想的角色，請見
+[三個工具的關係說明](https://github.com/canlgz/LearningBot-Legacy/blob/main/docs/LEARNING_TOOLS_COMPARISON.md)。
 
 請先閱讀 [系統定位與運作架構](docs/ARCHITECTURE.md)，再依
 [學生安裝與設定指南](docs/STUDENT_SETUP.md) 安裝。
