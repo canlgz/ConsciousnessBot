@@ -1422,11 +1422,11 @@ class ConfigTest(unittest.TestCase):
         with mock.patch.dict(os.environ, {"BURST_PACED_BUBBLES": "0"}, clear=True):
             self.assertFalse(config.Config.load(env_file="/dev/null").burst_paced_bubbles_enabled)
 
-    def test_plain_run_script_defaults_to_codex_deployment_branch(self):
+    def test_run_script_does_not_switch_to_a_development_branch(self):
         src = Path("run.sh").read_text(encoding="utf-8")
-        self.assertIn('origin/codex/proactive-voice', src)
-        self.assertIn('target="codex/proactive-voice"', src)
-        self.assertLess(src.index('origin/codex/proactive-voice'), src.index("refs/remotes/origin/claude/*"))
+        self.assertIn("本腳本不自行切換分支", src)
+        self.assertNotIn("git checkout -B", src)
+        self.assertNotIn("codex/proactive-voice", src)
 
 
 class TelegramTransportBoundaryTest(unittest.TestCase):

@@ -151,55 +151,21 @@
 
 ## 一次性設定
 
-### 1) 下載到本地
+這個 bot 是 WriteToLearn 的**旁路服務**：它只讀取 WriteToLearn 寫入 Google Drive 的資料，再在 Telegram 上互動；不會修改 LINE bot 或 Drive 內容。請先完成 [WriteToLearn 學生安裝](https://github.com/canlgz/WriteToLearn-Student-Setup)。
+
+完整、逐步且可驗證的流程請看 **[學生安裝與設定指南](docs/STUDENT_SETUP.md)**。完成後只需：
+
 ```bash
-git clone https://github.com/canlgz/telegram-monitor.git
-cd telegram-monitor
-```
-> clone 完會停在 `main` 沒關係——`run.sh` 每次啟動會自動把工作樹對齊到 Claude **最新的
-> `codex/proactive-voice` 分支**（見步驟 5），所以你永遠跑到這次協作的最新碼，不必記分支名、不必手動 `git pull`。
-
-### 2) Google service account（讀 Drive）
-1. 到 [Google Cloud Console](https://console.cloud.google.com/) 建一個專案（或用既有的）。
-2. **啟用 Google Drive API**。
-3. 建一個 **service account**，建立並下載它的 **JSON 金鑰**。
-4. 把 LINE bot 用的那個 **`DRIVE_ROOT_FOLDER_ID` 資料夾**，在 Drive 上**分享給該 service
-   account 的 email（檢視者即可）**。
-   - 想縮小範圍：只分享「你本人」那個子資料夾也行（資料夾名是你的 LINE 顯示名稱）。
-
-> 為什麼用 service account：本服務在 LINE bot 之外獨立運作，用 SA 唯讀直接讀同一個 Drive，
-> 不必碰 Apps Script、也不會干擾 LINE bot 的背景狀態。
-
-### 3) Telegram bot
-1. 在 Telegram 找 **@BotFather** → `/newbot` → 拿到 **bot token**。
-2. **先對你的新 bot 傳一則訊息**（隨便打字），讓 Telegram 有一筆 update。
-3. 取得你的 `chat_id`：
-   ```bash
-   python -m telegram_monitor --getchatid
-   ```
-   把印出來的數字填進 `TELEGRAM_CHAT_ID`。
-
-### 4) 設定檔
-```bash
+git clone https://github.com/canlgz/ConsciousnessBot.git
+cd ConsciousnessBot
 cp .env.example .env
-# 編輯 .env：填 GOOGLE_APPLICATION_CREDENTIALS / DRIVE_ROOT_FOLDER_ID /
-#            OWNER_LINE_USER_ID / TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID
-```
-`OWNER_LINE_USER_ID` = LINE bot 的 `OWNER_LINE_USER_ID`（Apps Script Script Property 裡那個）。
-
-### 5) 一鍵安裝＆執行
-就一個指令——`run.sh` 會自動：抓最新碼（預設對齊 `codex/proactive-voice`）→ 建好虛擬環境＋裝套件 → 啟動。
-```bash
+# 填妥 .env 後，先做不發送訊息的測試
+./run.sh --once --dry-run
+# 通過後才啟動常駐服務
 ./run.sh
 ```
-第一次它會幫你建立 `.env` 範本並請你填好金鑰；填完再跑一次 `./run.sh` 就啟動了。
 
-> 預設已固定跑 `codex/proactive-voice`；只有想改跑其他隔離分支時，才需要在 `.env` 設 `RUN_BRANCH=<分支>`。
-> 只想暫時指定一次則用 `RUN_BRANCH=codex/proactive-voice ./run.sh`。
-
-先乾跑驗證（只印不送）：`./run.sh --once --dry-run`
-
-> **之後要更新到最新版**：在 bot 視窗按 `Ctrl-C`，再跑一次 `./run.sh` 就好（等同 LINE bot 的 `./deploy.sh`）。
+更新時先停止服務（`Ctrl-C`），再執行 `git pull --ff-only`，最後重新執行 `./run.sh`。本專案不會自行切換或覆蓋你的分支。
 
 ---
 
@@ -375,14 +341,14 @@ python -m unittest discover -s tests
   那邊的判準時，記得同步這裡，否則「還缺什麼」會對不上 LINE 上看到的。
 - 密度（`semanticDensity`）一律取 LINE 已算好的值，本服務**不重算向量**（也不需要 Gemini key）。
 
-## 觀點修正第一階段（實驗分支）
+## 觀點修正第一階段
 
 `codex/conscious-dialogue-core` 新增 `CONSCIOUS_DIALOGUE=1`，預設關閉。
 沿用記寫聯想作為第一個完整接入點，保存原文版本、已送出的假設及明確否定，
 後續追問及重啟後仍保留更正。沒有增加模型呼叫或背景搜尋。
 
-部署與驗收見 [PHASE1_VALIDATION.md](PHASE1_VALIDATION.md)。現有 `run.sh` 預設仍選
-`codex/proactive-voice`，試用新核心必須指定 `RUN_BRANCH`，不能只確認 git pull 成功。
+部署與驗收見 [PHASE1_VALIDATION.md](PHASE1_VALIDATION.md)。學生版已包含此核心；依
+[學生安裝與設定指南](docs/STUDENT_SETUP.md) 使用 `main` 即可，無須切換任何開發分支。
 
 ### 資料幻覺防護（實驗分支）
 
